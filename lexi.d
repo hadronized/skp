@@ -55,7 +55,26 @@ import std.traits;
    savoir la première.
 
    Ok maintenant on va implémenter le séquenceur de parseurs. Un séquenceur de parseurs permet de mettre en séquence
-   deux parseurs. L’idée est simple: le type de retour est un Tuple!(eval_gauche, eval_droite).
+   deux parseurs. L’idée est simple: le type de retour est un Tuple!(eval_gauche, eval_droite). Il représente la
+
+   On va ajouter un concept important voire même indispensable : les slot-parsers. Un slot est un simple foncteur,
+   qui doit pouvoir être appelé sur le retour d’une fonction d’évaluation d’un parseur. Ainsi, un slot-parser est
+   un parseur qui va appeler un foncteur après une évaluation correcte du parseur dont est issu le slot-parser.
+
+   Un nouveau concept complexe : il est possible de lancer un autre parseur lorsqu’un parseur échoue. Cette notion
+   fait simplement référence à la disjonction de deux parseurs, qui dit que pour deux parseurs mis en disjonction,
+   un seul parseur peut être correctement évalué. Cela implique un résultat important : si le premier parseur est
+   évalué, le deuxième n’est pas appelé. Si le premier parseur n’est pas évalué, alors le deuxième doit être évalué
+   pour que le retour de la disjonction soit correctement évalué. Dans le cas contraire, la disjonction des deux
+   parseurs n’est pas évaluée.
+
+   L’idée est donc simple : on prend deux parseurs p0 et p1. On évalue p0. Si il est correctement évalué, alors
+   on retourne simplement son résultat. Sinon, on évalue p1. S’il est correctement évalué, on retourne son résultat,
+   sinon on retourne un objet notifiant l’échec de la disjonction.
+
+   On remarque une chose importante : en fonction du parseur qui va être évalué, le retour de la fonction d’évaluation
+   va changer. Ainsi, le type de retour de la fonction d’évaluation du parseur de disjonction va être un Variant. Il
+   sera soit du type de p0, soit du type de p1, soit un variant vide si la disjonction a échoué.
 */
 
 class CParseError : Throwable {
@@ -76,6 +95,16 @@ struct SParser(R_, RE_, alias D_, alias E_) {
         return e;
     }
 
+    /* slot */
+    auto opIndex(S_)(S_ slot) {
+        return SParser!(R_, RE_, D_, (ref R_ r) {
+            auto res = parse(r);
+            if (res[0])
+                slot(res[1]);
+            return res;
+        })();
+    }
+
     /* zero or more loop (*) */
     auto opUnary(string O_)() if (O_ == "*") {
         return SParser!(R_, RE_, D_, (ref R_ r) {
@@ -89,7 +118,7 @@ struct SParser(R_, RE_, alias D_, alias E_) {
                 res ~= pres[1];
             }
 
-            return res;
+            return Tuple!(bool, parse_type_t[])(true, res);
         })();
     }
 
@@ -155,22 +184,27 @@ TParser!(char[], char, DEL).SSuperLexemeParser _;
 alias TParser!(char[], char, DEL).l_ l_;
     
 int main() {
-    auto str = "a    test  ";
+    auto str = "[ section ] field = 314 ";
     auto input = str.dup;
 
     writefln("input (1): [%s]", input);
 
-    void foo(dchar c) {
-        writefln("read %c", c);
+    void section_name(in char[] n) {
+        writefln("section: %s", n);
     }
 
-    void bar(Tuple!(dchar, dchar) p) {
-        writefln("--> %s", p);
+    void field_name(in char[] n) {
+        writefln("field: %s", n);
     }
 
-    auto parser = l_!'a';
+    void value(in char[] n) {
+        writefln("value: %s", n);
+    }
+
+    auto parser = l_!'[' >> (*_)[&section_name] >> l_!']' >> (*_)[&field_name] >> l_!'=' >> (*_)[&value];
     auto res = parser.parse(input);
-    writefln("results: %s", res);
+
+    writefln("result: [%s]", res);
     writefln("input (2): [%s]", input);
 
     return 0;
