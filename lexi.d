@@ -139,13 +139,15 @@ template TParser(R_, RE_, alias D_) {
     }) SSuperLexemeParser;
 
     template l_(RE_ C_) {
-        alias SParser!(R_, RE_, D_, (ref char[] r) {
+        private SParser!(R_, RE_, D_, (ref char[] r) {
             SSuperLexemeParser _;
             auto res = _.parse(r);
             if (res[0] && res[1] == C_)
                 return res;
-            return Tuple!(bool, ReturnType!(SSuperLexemeParser.parse).Types)(false, res[1]);
-        }) l_;
+            return Tuple!(bool, ReturnType!(SSuperLexemeParser.parse).Types[1])(false, res[1]);
+        }) _p;
+
+        alias _p l_;
     }
 }
 
@@ -166,7 +168,7 @@ int main() {
         writefln("--> %s", p);
     }
 
-    auto parser = _;
+    auto parser = l_!'a';
     auto res = parser.parse(input);
     writefln("results: %s", res);
     writefln("input (2): [%s]", input);
