@@ -4,8 +4,16 @@
  */
 module skp.math.angle;
 
-import std.math : PI;
+static import std.math;
 
+/*********************
+ * PI.
+ *
+ * Note: becareful! The std.math.PI constant is real while
+ * it's float in skp.math.angle!
+ */
+enum PI = cast(float)(std.math.PI);
+ 
 /*********************
  * Angle type aliases.
  */
@@ -19,8 +27,8 @@ alias float rad_t;
  * Params:
  *     d = degrees to convert into radians
  */
-pure rad_t deg2rad(deg_t d){
-    return d*PI/180;
+rad_t deg2rad(deg_t d) pure nothrow {
+    return d*PI/180.0f;
 }
 
 /*********************
@@ -29,6 +37,16 @@ pure rad_t deg2rad(deg_t d){
  * Params:
  *     r = radians to convert into degrees
  */
-pure deg_t rad2deg(rad_t r) {
-    return r*180/PI;
+deg_t rad2deg(rad_t r) pure nothrow {
+    return r*180.0f/PI;
+}
+
+ unittest {
+    import skp.eqf;
+    assert ( eqf(rad2deg(PI), 180.0f) );
+    assert ( eqf(rad2deg(PI), 180.0f) );
+    assert ( eqf(deg2rad(180.0f), PI) );
+    assert ( eqf(rad2deg(PI/2), 90.0f) );
+    assert ( eqf(deg2rad(45.0f), PI/4) );
+    assert ( eqf(rad2deg(2*PI), 360.0f) );
 }

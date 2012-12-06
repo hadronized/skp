@@ -6,9 +6,9 @@
 module skp.event;
 
 /*********************
- * Event manager mixin.
+ * Event Handler mixin.
  *
- * An event manager is an object that handles signals (events)
+ * An event handler is an object that handles signals (events)
  * and triggers objects that want to know when an event occurs.
  *
  * You can turn a symbol (class/struct) to manage events using
@@ -16,7 +16,7 @@ module skp.event;
  * a method foo() in which you ask the user to type something.
  * When you finally get what he wrote, you want to notify all
  * attached objects the text he entered. It's quite simple: you
- * make your class an event manager, you create a listener
+ * make your class an event handler, you create a listener
  * interface that define a method on_input(), then after you
  * got the user text, just call the trigger function to
  * notify all attached objects that the user entered the given
@@ -25,24 +25,23 @@ module skp.event;
  * Params:
  *     L_ = type of listener
  */
-mixin template MTEventManager(L_) {
+mixin template MTEventHandler(L_) {
     private L_[] _listeners;
 
     /*********************
      * Attach an object to notify events.
      *
      * The object to attach must implement the interface of the
-     * event manager.
+     * event handler.
      *
-     * After a call to that method, the event manager will
+     * After a call to that method, the event Handler will
      * notify that object on an event.
      *
      * Params:
      *     l = object to attach
      */
     void add_listener(L_ l) {
-        ++_listeners.length;
-        _listeners[$-1] = l;
+        _listeners ~= l;
     }
 
     /*********************

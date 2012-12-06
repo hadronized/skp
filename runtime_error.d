@@ -12,8 +12,4 @@ import std.exception;
  *
  * That class is the base class of all exceptions.
  */
-class CRuntimeError : Exception {
-    this(string msg) {
-        super("runtime error: " ~ msg);
-    }
-}
+alias Exception CRuntimeError;

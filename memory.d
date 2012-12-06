@@ -1,5 +1,11 @@
+/**
+ * Author: Dimitri 'skp' Sabadie <dimitri.sabadie@gmail.com>
+ * License: GPLv3
+ */
+ 
 module skp.memory;
 
+version ( none ) {
 auto inst(T_, A...)(A args) {
     auto p = new T_(args);
 
@@ -64,3 +70,32 @@ struct s_ptr(T_) {
         }
     }
 }
+}
+
+import core.exception;
+import core.memory : GC;
+import std.c.stdlib;
+import skp.log;
+/*********************
+ * Tracked allocation mixin template.
+ *
+ * That mixin template can be used to track allocation in the
+ * logger.
+ */
+mixin template MTTrackedAllocation {
+    new(size_t s) {
+        auto p = std.c.stdlib.malloc(s);
+        if (!p)
+            throw new OutOfMemoryError();
+        GC.addRange(p, s);
+        log(ELog.DEBUG, "allocated %d bytes at 0x%x for instance of %s", s, p, this);
+        return p;
+    }
+    
+    delete(void *p) {
+        if (!p) {
+            GC.removeRange(p);
+            std.c.stdlib.free(p);
+            log(ELog.DEBUG, "deallocated 0x%x", p);
+        }
+    }

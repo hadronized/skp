@@ -8,7 +8,7 @@ module skp.math.constants;
 public import std.math;
 
 /*********************
- * The Golden ration constant.
+ * The Golden ratio constant.
  *
  * The Golden ratio is a math constant used to construct golden object.
  * The Golden ratio is (1 + sqrt(5)) / 2.

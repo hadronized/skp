@@ -5,7 +5,7 @@
 
 module skp.log;
 
-import std.stdio : write, writefln;
+import std.stdio;
 import std.datetime;
 import std.format;
 
@@ -31,10 +31,11 @@ char skp_logflag;
  */
 enum ELog {
     NONE    = 0x00,
+    ALL     = 0xFF,
     DEBUG   = 0x01,
     WARNING = 0x02,
     ERROR   = 0x04,
-    ALL     = 0x07
+    LOG     = 0x08
 }
 
 /*********************
@@ -57,22 +58,27 @@ enum ELog {
  * ----------
  */
 
-void log(A...)(ELog flag, A msg) {
+void log(A...)(ELog flag, lazy A msg) {
+    if (skp_logflag == ELog.NONE)
+        return;
+        
     auto time = cast(DateTime)Clock.currTime();
     auto t = time.toSimpleString() ~ " | ";
 
-    if (skp_logflag == ELog.NONE)
-        return;
     if (skp_logflag & ELog.DEBUG & flag) {
-        write(t);
+        writef("%sdebug: ", t);
         writefln(msg);
     }
     if (skp_logflag & ELog.WARNING & flag) {
-        write(t ~ "warning: ");
+        writef("%swarning: ", t);
         writefln(msg);
     }
     if (skp_logflag & ELog.ERROR & flag) {
-        write(t ~ "error: ");
+        stderr.writef("%serror: ", t);
+        writefln(msg);
+    }
+    if (skp_logflag & ELog.LOG & flag) {
+        write(t);
         writefln(msg);
     }
 }
