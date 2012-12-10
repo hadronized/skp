@@ -25,7 +25,7 @@ module skp.event;
  * Params:
  *     L_ = type of listener
  */
-mixin template MTEventHandler(L_) {
+mixin template EventHandler(L_) {
     private L_[] _listeners;
 
     /*********************
