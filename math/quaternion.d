@@ -6,7 +6,7 @@
 module skp.math.quaternion;
 
 import std.algorithm : reduce;
-import std.math : sin, sqrt;
+import skp.math.fun : sin, sqrt;
 import skp.math.angle;
 import skp.math.axis;
 
@@ -16,10 +16,10 @@ import skp.math.axis;
  * A quaternion, mainly used for local rotations.
  * Value semantic.
  */
-struct SQuat {
+struct quat_s {
     alias typeof(this) that;
 
-    private SAxis3 _axis;
+    private axis3_s _axis;
     private float _phi;
 
     @property {
@@ -82,7 +82,7 @@ struct SQuat {
      *     a = axis to turn around
      *     phi = angle of rotation
      */
-    this(in SAxis3 a, rad_t phi) in {
+    this(axis3_s a, rad_t phi) in {
         assert ( a.norm == 1.0f ); /* the axis has to be normalized */
     } body {
         _axis = a * sin(phi/2);
@@ -109,7 +109,7 @@ struct SQuat {
      * Returns: the quaterion after it's been multiplied by rhs
      */
     ref that opOpAssign(string op)(in that rhs) if (op == "*") {
-        _axis = SAxis3(
+        _axis = axis3_s(
             _phi*rhs._axis.x + _axis.x*rhs._phi + _axis.y*rhs._axis.z - _axis.z*rhs._axis.y,
             _phi*rhs._axis.y + _axis.y*rhs._phi + _axis.z*rhs._axis.x - _axis.x*rhs._axis.z,
             _phi*rhs._axis.z + _axis.z*rhs._phi + _axis.x*rhs._axis.y - _axis.y*rhs._axis.x
@@ -135,8 +135,8 @@ struct SQuat {
      *
      * Returns: a 4x4 float matrix representation of the quaternion
      */
-    auto opCast(SMat44)() const {
-        SMat44 r = void;
+    auto opCast(mat44_s)() const {
+        mat44_s r = void;
 
         foreach (i; 0..3) {
             r[i,3] = r[3,i] = 0.0f;

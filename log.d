@@ -15,10 +15,10 @@ import std.format;
  * That flag is a bitfields describing what
  * piece of the logger is enabled. For instance,
  * you can disable any output of the logger by
- * setting that flag to ELog.NONE. If you want
+ * setting that flag to log_e.NONE. If you want
  * it to output only debug information, set it
- * to ELog.DEBUG. Debug and errors only: set it
- * to ELog.DEBUG | Elog.ERROR; and so on.
+ * to log_e.DEBUG. Debug and errors only: set it
+ * to log_e.DEBUG | Elog.ERROR; and so on.
  */
 char skp_logflag;
 
@@ -29,7 +29,7 @@ char skp_logflag;
  * to specify what part of the logger you want
  * to turn on or to log to specific parts of it.
  */
-enum ELog {
+enum log_e {
     NONE    = 0x00,
     ALL     = 0xFF,
     DEBUG   = 0x01,
@@ -52,32 +52,32 @@ enum ELog {
  *
  * Examples:
  * ----------
- * log(ELog.DEBUG, "this is written as a debug message");
- * log(ELog.WARNING, "this is a warning message");
- * log(ELog.DEBUG | ELog.ERROR, "this message is output twice as a debug and error message");
+ * log(log_e.DEBUG, "this is written as a debug message");
+ * log(log_e.WARNING, "this is a warning message");
+ * log(log_e.DEBUG | log_e.ERROR, "this message is output twice as a debug and error message");
  * ----------
  */
 
-void log(A...)(ELog flag, lazy A msg) {
-    if (skp_logflag == ELog.NONE)
+void log(A...)(log_e flag, lazy A msg) {
+    if (skp_logflag == log_e.NONE)
         return;
         
     auto time = cast(DateTime)Clock.currTime();
     auto t = time.toSimpleString() ~ " | ";
 
-    if (skp_logflag & ELog.DEBUG & flag) {
+    if (skp_logflag & log_e.DEBUG & flag) {
         writef("%sdebug: ", t);
         writefln(msg);
     }
-    if (skp_logflag & ELog.WARNING & flag) {
+    if (skp_logflag & log_e.WARNING & flag) {
         writef("%swarning: ", t);
         writefln(msg);
     }
-    if (skp_logflag & ELog.ERROR & flag) {
+    if (skp_logflag & log_e.ERROR & flag) {
         stderr.writef("%serror: ", t);
         writefln(msg);
     }
-    if (skp_logflag & ELog.LOG & flag) {
+    if (skp_logflag & log_e.LOG & flag) {
         write(t);
         writefln(msg);
     }

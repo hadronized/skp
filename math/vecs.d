@@ -6,7 +6,7 @@
 module skp.math.vecs;
 
 import std.algorithm : map, reduce;
-import std.math : sqrt;
+import skp.math.fun : sqrt;
 import skp.traits;
 
 /*********************
@@ -18,10 +18,10 @@ import skp.traits;
  *     D_ = the size of the vector (2 <= D_ <= 4)
  *     T_ = the type of the stored elements
  */
-struct SVec(uint D_, T_) if (D_ >= 2 && D_ <= 4) {
+struct vec_s(uint D_, T_) if (D_ >= 2 && D_ <= 4) {
     private alias typeof(this) that;
 
-    private mixin template MTAddCompProperties(string N_, uint I_) {
+    private mixin template AddCompProperties(string N_, uint I_) {
         mixin("
             @property T_ " ~ N_ ~ "() const {
                 return _[I_];
@@ -35,17 +35,17 @@ struct SVec(uint D_, T_) if (D_ >= 2 && D_ <= 4) {
     /* components */
     private T_[D_] _;
 
-    mixin MTAddCompProperties!("x", 0u);
-    mixin MTAddCompProperties!("r", 0u);
-    mixin MTAddCompProperties!("y", 1u);
-    mixin MTAddCompProperties!("g", 1u);
+    mixin AddCompProperties!("x", 0u);
+    mixin AddCompProperties!("r", 0u);
+    mixin AddCompProperties!("y", 1u);
+    mixin AddCompProperties!("g", 1u);
     static if (D_ > 2) {
-        mixin MTAddCompProperties!("z", 2u);
-        mixin MTAddCompProperties!("b", 2u);
+        mixin AddCompProperties!("z", 2u);
+        mixin AddCompProperties!("b", 2u);
     }
     static if (D_ > 3) {
-        mixin MTAddCompProperties!("w", 3u);
-        mixin MTAddCompProperties!("a", 3u);
+        mixin AddCompProperties!("w", 3u);
+        mixin AddCompProperties!("a", 3u);
     }
 
     /*********************
@@ -99,7 +99,7 @@ struct SVec(uint D_, T_) if (D_ >= 2 && D_ <= 4) {
         set_!0u(params);
     }
 
-    /* This method recursively builds the SVec */
+    /* This method recursively builds the vec */
     /* BUG: we can't use array */
     private void set_(alias I_, H_, R_...)(H_ head, R_ remaining) if (I_ <= D_) {
         static if (is(H_ : T_)) {
@@ -108,7 +108,7 @@ struct SVec(uint D_, T_) if (D_ >= 2 && D_ <= 4) {
             /* and go to the next component */
             set_!(I_+1u)(remaining);
         } else {
-            static if (THas!(H_, "slice")) { /* TODO: I think we have to test if H has slice, not SVec, which obviously has it */
+            static if (Has!(H_, "slice")) {
                 _[I_..I_+H_.length] = head[];
                 set_!(I_+H_.length)(remaining);
             } else {
@@ -298,11 +298,11 @@ struct SVec(uint D_, T_) if (D_ >= 2 && D_ <= 4) {
  *     rhs = point b
  * Returns: the distance between a and b
  */
-auto dist(uint D_, T_)(in SVec!(D_, T_) lhs, in SVec!(D_, T_) rhs) if (__traits(isArithmetic, T_)) {
+auto dist(uint D_, T_)(vec_s!(D_, T_) lhs, vec_s!(D_, T_) rhs) if (__traits(isArithmetic, T_)) {
     return (lhs - rhs).norm;
 }
 
-auto dot(uint D_, T_)(in SVec!(D_, T_) lhs, in SVec!(D_, T_) rhs) if (__traits(isArithmetic, T_)) {
+auto dot(uint D_, T_)(vec_s!(D_, T_) lhs, vec_s!(D_, T_) rhs) if (__traits(isArithmetic, T_)) {
     T_ r = T_.init;
 
     foreach (i; 0u .. D_-1)
@@ -311,16 +311,16 @@ auto dot(uint D_, T_)(in SVec!(D_, T_) lhs, in SVec!(D_, T_) rhs) if (__traits(i
     return r;
 }
 
-alias SVec!(2, float) SVec2;
-alias SVec!(3, float) SVec3;
-alias SVec!(4, float) SVec4;
+alias vec_s!(2, float) vec2_s;
+alias vec_s!(3, float) vec3_s;
+alias vec_s!(4, float) vec4_s;
 
 /*********************
  * Trait template for vectors.
  *
  * Deprecated: use the vector's own property instead
  */
-deprecated template TVecTrait(V_ : SVec!(D_, T_), uint D_, T_) {
+deprecated template VecTrait(V_ : vec_s!(D_, T_), uint D_, T_) {
     alias D_ dimension;
     alias T_ value_type;
 }

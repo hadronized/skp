@@ -46,28 +46,28 @@ class CRun : CCompositeLogic {
  * Bugs: up to know, there's no support of return code
  *       of the bootstrap run function
  */
-class CRun {
+class run_c {
     bool ran;
 
     this() {
         ran = false;
     }
 
-    int run(__Bootstrap)() {
-        static if(!is(__Bootstrap))
+    int run(Bootstrap_)() {
+        static if(!is(Bootstrap_))
             static assert (0, "no bootstrap class given");
         ran = true;
 
-        log(ELog.DEBUG, "initializing the bootstrap");
-        auto boot = new __Bootstrap;
+        log(log_e.DEBUG, "initializing the bootstrap");
+        auto boot = new Bootstrap_;
         boot.init(this);
 
-        log(ELog.DEBUG, "running the application");
+        log(log_e.DEBUG, "running the application");
         while (ran) {
             if (!boot.run())
                 break;
         }
-        log(ELog.DEBUG, "application ended");
+        log(log_e.DEBUG, "application ended");
         return 0;
     }
 }

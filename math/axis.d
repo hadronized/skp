@@ -10,12 +10,13 @@ import skp.math.vecs;
 /*********************
  * Axis type aliases
  */
-alias SVec2 SAxis2;
-alias SVec3 SAxis3;
+alias vec2_s axis2_s;
+alias vec3_s axis3_s;
 
 /*********************
  * Common X, Y and Z axis.
  */
-enum SAxis3 X_AXIS = SAxis3(1.0, 0.0, 0.0);
-enum SAxis3 Y_AXIS = SAxis3(0.0, 1.0, 0.0);
-enum SAxis3 Z_AXIS = SAxis3(0.0, 0.0, -1.0);
+/* FIXME */
+enum axis3_s X_AXIS = axis3_s(1.0, 0.0, 0.0);
+enum axis3_s Y_AXIS = axis3_s(0.0, 1.0, 0.0);
+enum axis3_s Z_AXIS = axis3_s(0.0, 0.0, -1.0);

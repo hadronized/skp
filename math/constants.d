@@ -5,7 +5,7 @@
 
 module skp.math.constants;
 
-public import std.math;
+public import skp.math.fun : sqrt;
 
 /*********************
  * The Golden ratio constant.

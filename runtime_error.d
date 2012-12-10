@@ -12,4 +12,4 @@ import std.exception;
  *
  * That class is the base class of all exceptions.
  */
-alias Exception CRuntimeError;
+alias Exception runtime_error_c;

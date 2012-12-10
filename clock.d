@@ -15,7 +15,7 @@ import skp.log;
  * the clock counts, and at anytime you can get the elapsed
  * time.
  */
-class CClock {
+class clock_c {
     private TickDuration _start;
 
     /*********************

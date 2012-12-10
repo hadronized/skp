@@ -19,11 +19,11 @@ public import std.traits;
  *     T_ = symbol to test
  *     Q_ = string representing the feature
  */
-template THas(T_, string Q_) if (Q_ == "slice") {
+template Has(T_, string Q_) if (Q_ == "slice") {
     static if (is(T_ == class) || is(T_ == struct))
-        enum THas = __traits(hasMember, T_, "opSlice");
+        enum Has = __traits(hasMember, T_, "opSlice");
     else
-        enum THas = isArray!T_;
+        enum Has = isArray!T_;
 }
 
 /*********************
@@ -39,6 +39,6 @@ template THas(T_, string Q_) if (Q_ == "slice") {
  *     T_ = symbol te test
  *     Q_ = string representing the concept
  */
-template TLike(T_, string Q_) if (Q_ == "array") {
-    enum TLike = THas!(T_, "slice");
+template Like(T_, string Q_) if (Q_ == "array") {
+    enum Like = Has!(T_, "slice");
 }

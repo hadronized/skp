@@ -3,9 +3,9 @@
  * License: GPLv3
  */
 
-module skp.math.trigo;
+module skp.math.fun;
 
-public import std.math : acos;
+public import std.math : cos, sin, tan, acos, asin, atan, sqrt;
 
 /*********************
  */

@@ -5,14 +5,14 @@
  
 module skp.math.matrix;
 
-import std.math : tan;
+//import skp.math.fun : tan;
 
 /*********************
  * 4x4 float matrix.
  *
  * A square matrix of size 4. Value semantic.
  */
-struct SMat44 {
+struct mat44_s {
     private alias typeof(this) that;
 
     private float[16] _;
@@ -158,7 +158,7 @@ struct SMat44 {
 /* I think these unit tests are pointless. */
 unittest {
     /* identity test */
-    SMat44 m = SMat44.init;
+    auto m = mat44_s.init;
     assert ( m == [
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
@@ -167,7 +167,7 @@ unittest {
     ] );
 
     /* assign operator and row major */
-    SMat44 m2 = m;
+    auto m2 = m;
     m2[2,3] = 3.14f;
     assert ( m2 == [
             1.0f, 0.0f, 0.0f, 0.0f,
@@ -178,4 +178,45 @@ unittest {
 
     /* matrix inner product */
     assert ( (m * m2)  == m2 );
+}
+
+/* matrix generators */
+mat44_s make_trslt(vec3_s t) {
+    return mat44_s([
+        1.0f,  .0f,  .0f, .0f,
+         .0f, 1.0f,  .0f, .0f,
+         .0f,  .0f, 1.0f, .0f,
+         t.x,  t.y,  t.z, 1.0f
+    ]); 
+}
+
+mat44_s make_perspective(float fovy, float ratio, float znear, float zfar) in {
+    assert ( fovy > 0.0f );
+    assert ( ratio > 0.0f );
+    assert ( znear < zfar );
+} body {
+    float itanfovy = 1.0f / tan(fovy / 2.0f);
+    float itanfovyr = itanfovy / ratio;
+    float inf = 1.0f / (znear - zfar);
+    float nfinf = (znear + zfar) * inf;
+
+    return mat44_s([
+            itanfovyr,     0.0f,  0.0f,    0.0f,
+                 0.0f, itanfovy,  0.0f,    0.0f,
+                 0.0f,     0.0f,   inf,   -1.0f, 
+                 0.0f,     0.0f, nfinf,    0.0f 
+    ]);
+
+    /*
+    auto fovy_2 = fovy / 2;
+    auto f = 1.0f / tan(fovy_2);
+    auto n_f = znear - zfar;
+
+    return SMat44([
+            f / ratio, .0f,                .0f,   .0f,
+                  .0f,   f,                .0f,   .0f,
+                  .0f, .0f, (zfar + znear)/n_f, -1.0f,
+                  .0f, .0f,   2*zfar*znear/n_f,   .0f
+    ]);
+    */
 }
